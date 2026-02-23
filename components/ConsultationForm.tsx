@@ -125,7 +125,7 @@ export const ConsultationForm: React.FC = () => {
                       </div>
                       <div>
                           <p className="text-xs font-bold opacity-70">교육문의</p>
-                          <a href="tel:15336176" className="text-2xl font-black block hover:opacity-80 transition-opacity md:pointer-events-none md:cursor-default">1533-6176</a>
+                          <a href="tel:15336176" className="text-2xl font-black block hover:text-red-600 transition-colors md:pointer-events-none md:cursor-default">1533-6176</a>
                       </div>
                   </div>
                   <div className="flex items-center gap-4">

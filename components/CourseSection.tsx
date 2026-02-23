@@ -45,9 +45,21 @@ const CURRICULUM_DATA = [
     image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=2940&auto=format&fit=crop",
     subjects: [
       { title: "기본 프로젝트", desc: "보안 취약점 진단, 클라우드 IAM/보안 정책 수립, 기본 보안 관제 시스템 구축 및 로그 분석을 통한 위협 탐지/대응 실습." },
-      { title: "심화 프로젝트", desc: "SIEM 활용 및 암호학 기반 보안 솔루션 구현, 팀 단위 복합 보안 시스템 설계 및 운영." },
       { title: "특강 2", desc: "현직자 초빙 심화 주제 특강." },
       { title: "취업 준비 역량 테스트 대비", desc: "역량 평가 및 피드백, 취업 전략 학습." }
+    ]
+  },
+  {
+    id: "month-4",
+    month: "4개월",
+    title: "심화 프로젝트 시작 및 해커톤",
+    desc: "심화 프로젝트와 해커톤을 통해 실무 능력을 강화하고 창의적 해결 능력을 기릅니다.",
+    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2940&auto=format&fit=crop",
+    subjects: [
+      { title: "심화 프로젝트", desc: "고급 네트워크 및 클라우드 보안을 강화하며, SIEM 활용과 암호학으로 설계된 보안 솔루션을 구현하여 실시간 위협 탐지 및 대응 역량을 발전시킵니다. 팀 단위로 협업하여 복합 보안 시스템을 설계하고 운영하며 심화된 실무 경험을 쌓습니다." },
+      { title: "해커톤", desc: "제한된 시간 내 팀별 아이디어 구상과 제품 설계를 진행하며 집중적인 협업을 통해 창의적 해결능력을 학습합니다." },
+      { title: "특강 3", desc: "기업 연사 또는 전문가를 초빙하여 사이버 보안 사례와 과정에 필요한 심화 주제를 다루는 특강을 진행합니다." },
+      { title: "취업 준비 역량 테스트 대비", desc: "매월 과정 별 역량 평가 및 피드백을 진행합니다. 최신 구직 동향 및 사례를 연구하며, 자기 PR을 위한 효과적인 취업 전략을 학습합니다." }
     ]
   },
   {
@@ -135,6 +147,25 @@ export const CourseSection: React.FC = () => {
   // 모바일 스크롤 버그 수정:
   // auto-scroll 기능 제거. 모든 버튼이 화면에 보이므로 스크롤 할 필요가 없으며,
   // scrollIntoView가 페이지 전체 스크롤을 유발하여 위로 튀는 현상을 방지함.
+  // 단, 가로 스크롤이 추가되었으므로 모바일에서 가로 방향으로만 스크롤되도록 설정
+  useEffect(() => {
+    if (isMobile && scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const activeButton = container.querySelector(`[data-id="${activeId}"]`) as HTMLElement;
+      if (activeButton) {
+        const containerRect = container.getBoundingClientRect();
+        const buttonRect = activeButton.getBoundingClientRect();
+        
+        // 버튼이 컨테이너 뷰포트 중앙에 오도록 스크롤 위치 계산
+        const scrollLeft = activeButton.offsetLeft - (containerRect.width / 2) + (buttonRect.width / 2);
+        
+        container.scrollTo({
+          left: scrollLeft,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [activeId, isMobile]);
 
   // Scroll to section
   const scrollToSection = (id: string) => {
@@ -181,8 +212,8 @@ export const CourseSection: React.FC = () => {
             >
               <div 
                  ref={scrollContainerRef}
-                 // 모바일에서 flex-row + 버튼 flex-1을 사용하여 모든 버튼을 한 줄에 균등 배치
-                 className={`flex ${isMobile ? 'flex-row w-full py-3 gap-1.5' : 'flex-col gap-2'}`}
+                 // 모바일에서 flex-row + 가로 스크롤을 사용하여 많은 버튼을 수용
+                 className={`flex ${isMobile ? 'flex-row w-full py-3 gap-1.5 overflow-x-auto scrollbar-hide' : 'flex-col gap-2'}`}
               >
                 {CURRICULUM_DATA.map((item) => (
                   <button
@@ -192,7 +223,7 @@ export const CourseSection: React.FC = () => {
                     className={`
                       relative group flex items-center transition-all duration-300 border whitespace-nowrap
                       ${isMobile 
-                        ? 'flex-1 justify-center text-[11px] py-2.5 px-0 rounded-lg shadow-sm font-bold' // 모바일: 꽉 찬 너비, 작은 폰트, 중앙 정렬
+                        ? 'flex-shrink-0 min-w-[52px] justify-center text-[11px] py-2.5 px-1 rounded-lg shadow-sm font-bold' // 모바일: 가로 스크롤 대응
                         : 'w-full gap-3 px-4 py-3 rounded-xl text-left' // PC: 기존 스타일 유지
                       }
                       ${activeId === item.id 
@@ -201,7 +232,7 @@ export const CourseSection: React.FC = () => {
                             : 'bg-red-700 text-white border-red-600 shadow-[0_0_15px_rgba(185,28,28,0.4)]')
                         : (isMobile
                             ? 'bg-white/40 text-black border-transparent hover:bg-white/60'
-                            : 'bg-zinc-900/80 text-zinc-500 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-300')
+                            : 'bg-zinc-900/80 text-zinc-500 border-zinc-800 hover:bg-zinc-800 hover:text-red-600')
                       }
                     `}
                   >
